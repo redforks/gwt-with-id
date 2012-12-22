@@ -105,6 +105,29 @@ Index: user/src/com/google/gwt/user/client/ui/UIObject.java
     * Sets the object's size, in pixels, not including decorations such as
     * border, margin, and padding.
     * 
+Index: user/src/com/google/gwt/user/client/ui/SimplePanel.java
+===================================================================
+--- user/src/com/google/gwt/user/client/ui/SimplePanel.java	(revision 11429)
++++ user/src/com/google/gwt/user/client/ui/SimplePanel.java	(working copy)
+@@ -69,6 +69,18 @@
+     setWidget(w);
+   }
+ 
++  @Override
++  public <T extends UIObject> T findViewById(String id) {
++    T result = super.findViewById(id);
++    if (result == null) {
++      Widget child = getWidget();
++      if (child != null) {
++        result = child.findViewById(id);
++      }
++    }
++    return result;
++  }
++
+   /**
+    * Gets the panel's child widget.
+    * 
 Index: user/build.xml
 ===================================================================
 --- user/build.xml	(revision 11429)
