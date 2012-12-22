@@ -2,7 +2,7 @@ Index: user/src/com/google/gwt/user/client/ui/Panel.java
 ===================================================================
 --- user/src/com/google/gwt/user/client/ui/Panel.java	(revision 11429)
 +++ user/src/com/google/gwt/user/client/ui/Panel.java	(working copy)
-@@ -79,6 +79,22 @@
+@@ -79,6 +79,21 @@
      }
    }
  
@@ -16,7 +16,6 @@ Index: user/src/com/google/gwt/user/client/ui/Panel.java
 +        if (result != null) {
 +          break;
 +        }
-+        it.remove();
 +      }
 +    }
 +    return result;
@@ -48,7 +47,7 @@ Index: user/src/com/google/gwt/user/client/ui/UIObject.java
 +   */
 +  public <T extends UIObject> T findViewById(String id) {
 +    assert id != null;
-+    if (mId.equals(id)) {
++    if (id.equals(mId)) {
 +      return (T)this;
 +    } else {
 +      return null;
