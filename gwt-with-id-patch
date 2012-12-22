@@ -1,0 +1,140 @@
+Index: user/src/com/google/gwt/user/client/ui/Panel.java
+===================================================================
+--- user/src/com/google/gwt/user/client/ui/Panel.java	(revision 11429)
++++ user/src/com/google/gwt/user/client/ui/Panel.java	(working copy)
+@@ -79,6 +79,22 @@
+     }
+   }
+ 
++  @Override
++  public <T extends UIObject> T findViewById(String id) {
++    T result = super.findViewById(id);
++    if (result == null) {
++      Iterator<Widget> it = iterator();
++      while (it.hasNext()) {
++        result = it.next().findViewById(id);
++        if (result != null) {
++          break;
++        }
++        it.remove();
++      }
++    }
++    return result;
++  }
++
+   /**
+    * Removes a child widget.
+    * 
+Index: user/src/com/google/gwt/user/client/ui/UIObject.java
+===================================================================
+--- user/src/com/google/gwt/user/client/ui/UIObject.java	(revision 11429)
++++ user/src/com/google/gwt/user/client/ui/UIObject.java	(working copy)
+@@ -132,6 +132,8 @@
+    */
+   private static JavaScriptObject numberRegex;
+ 
++	private String mId;
++
+   /*
+    * WARNING: For historical reasons, there are two Element classes being used
+    * in this code. The dom.Element (com.google.gwt.dom.client.Element) class is
+@@ -522,6 +524,20 @@
+   }
+ 
+   /**
++   * Find and return the 1st view has the id in the sub view tree.
++   *
++   * @return null if no such view
++   */
++  public <T extends UIObject> T findViewById(String id) {
++    assert id != null;
++    if (mId.equals(id)) {
++      return (T)this;
++    } else {
++      return null;
++    }
++  }
++
++  /**
+    * Gets the object's absolute left position in pixels, as measured from the
+    * browser window's client area.
+    * 
+@@ -558,6 +574,15 @@
+   }
+ 
+   /**
++   * Gets id
++   *
++   * @return the id for current UIObject
++   */
++  public final String getId() {
++    return mId;
++  }
++
++  /**
+    * Gets the object's offset height in pixels. This is the total height of the
+    * object, including decorations such as border and padding, but not margin.
+    * 
+@@ -611,6 +636,14 @@
+     return DOM.getElementProperty(getElement(), "title");
+   }
+ 
++  public final <T extends UIObject> T getViewById(String id) {
++    T result = findViewById(id);
++    if (result == null) {
++      throw new IllegalArgumentException("'" + id + "' not found");
++    }
++    return result;
++  }
++
+   @Override
+   public boolean isVisible() {
+     return isVisible(getElement());
+@@ -655,6 +688,15 @@
+   }
+ 
+   /**
++   * Set an id for current UIObject
++   *
++   * @param id the UIObject's new id, can be any string, program normal identity rule is recommend.
++   */
++  public final void setId(String id) {
++    mId = id;
++  }
++
++  /**
+    * Sets the object's size, in pixels, not including decorations such as
+    * border, margin, and padding.
+    * 
+Index: user/build.xml
+===================================================================
+--- user/build.xml	(revision 11429)
++++ user/build.xml	(working copy)
+@@ -177,6 +177,7 @@
+         <pathelement location="${project.build}/bin/com/google/web/bindery/autobean/AutoBean.gwtar" />
+         <pathelement location="${project.build}/bin/com/google/web/bindery/requestfactory/RequestFactory.gwtar" />
+         <pathelement location="${project.build}/bin/com/google/gwt/logging/Logging.gwtar" />
++        <path path="../tools/lib/apache/tapestry-util-text-4.0.2.jar"/>
+       </targetfiles>
+       <sequential>
+         <compileModule>
+Index: dev/build.xml
+===================================================================
+--- dev/build.xml	(revision 11429)
++++ dev/build.xml	(working copy)
+@@ -120,6 +120,7 @@
+       </sourcefiles>
+       <targetfiles>
+         <fileset file="${alldeps.jar}"/>
++        <path path="../tools/lib/apache/tapestry-util-text-4.0.2.jar"/>
+       </targetfiles>
+       <sequential>
+         <gwt.jar destfile="${alldeps.jar}">
+@@ -324,6 +325,7 @@
+       </sourcefiles>
+       <targetfiles>
+         <fileset file="${project.lib}"/>
++        <path path="../tools/lib/apache/tapestry-util-text-4.0.2.jar"/>
+       </targetfiles>
+       <sequential>
+         <gwt.jar>
